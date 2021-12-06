@@ -1,0 +1,15 @@
+{
+  "name": "juniper-vsrx",
+  "description": "This box contains the Juniper vSRX device.",
+  "versions": [
+    {
+      "version": "VER",
+      "providers": [
+        {
+          "name": "libvirt",
+          "url": "file://HOME/boxes/juniper-vsrx-VER.box"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+set timeout 300
+set prompt "(>|#) $"
+log_file -noappend "~/vsrx-console.explog"
+
+spawn telnet 127.0.0.1 52099
+
+# log in with superuser account
+expect "login:"
+send "root\r"
+expect "JUNOS"
+send "\r"
+expect -re $prompt
+
+# enter junos cli
+send "cli\r"
+expect -re $prompt
+sleep 5
+
+# enter configuration mode
+send "configure\r"
+expect -re $prompt
+
+# set the superuser password
+send "set system root-authentication plain-text-password\r"
+expect "New password:"
+send "Juniper96!\r"
+expect "Retype new password:"
+send "Juniper96!\r"
+expect -re $prompt
+
+# vagrant user
+## set the login class
+send "set system login user vagrant class super-user\r"
+expect -re $prompt
+
+## set the password
+send "set system login user vagrant authentication plain-text-password\r"
+expect "New password:"
+send "Vagrant10!\r"
+expect "Retype new password:"
+send "Vagrant10!\r"
+expect -re $prompt
+
+## set the public key for ssh auth
+send "set system login user vagrant authentication ssh-rsa \"ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key\"\r"
+expect -re $prompt
+
+# enable dhcp for the management network interface
+send "set interfaces fxp0 unit 0 family inet dhcp\r"
+expect -re $prompt
+
+# enable netconf
+send "set system services netconf ssh\r"
+
+# commit the changes
+expect -re $prompt {
+    send "commit comment \"Base configuration for Vagrant\"\r"
+    send "exit\r"
+}
+
+# power off
+sleep 5
+send "request system power-off\r"
+expect "Power Off the system"
+send "yes\r"
+expect "Powering system off"
+sleep 5
