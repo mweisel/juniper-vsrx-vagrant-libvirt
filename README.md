@@ -73,7 +73,6 @@ $ <b>cd juniper-vsrx-vagrant-libvirt</b>
 7\. Run the Ansible playbook.
 
 <pre>
-$ <b>cd ..</b>
 $ <b>ansible-playbook main.yml</b>
 </pre>
 
